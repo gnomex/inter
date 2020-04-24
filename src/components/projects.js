@@ -1,31 +1,69 @@
 import React from 'react';
 import Project from './project';
+import Pagination from './pagination';
+import api from "../services/api";
 
 export default class Projects extends React.Component {
     constructor(props) {
         super(props);
 
-        var projects =  [
-            {
-                name: 'PL 92/2019',
-                description: 'Dá nova redação ao art. 1º da Lei Municipal nº 3.017, de 19 de junho de 2017, que Institui o Dia Municipal da Pessoa com Surdocegueira.',
-                link: 'https://sapl.camaranh.rs.gov.br/materia/64952'
-            }
-        ]
-
         this.state = {
-            projects: projects,
-            filtered: projects
+            projects: [],
+            filtered: [],
+            pagination: {}
         }
     }
 
+    componentDidMount() {
+      this.loadProjects();
+    }
+
+    loadProjects = async (page = 1) => {
+      console.log("getting page", page)
+      const response = await api.get(`/projects?page=${page}`);
+
+      const { projects, ...pagination } = response.data;
+
+      this.setState({ projects, pagination });
+    }
+
+    prevPage = () => {
+      const { page, ...pagination } = this.state.pagination;
+
+      if (page === 1) return;
+
+      const prevPageNumber = page - 1;
+
+      this.loadProjects(prevPageNumber);
+    }
+
+    nextPage = () => {
+      const { page, ...pagination } = this.state.pagination;
+
+      if (page === pagination.total_pages) return;
+
+      const nextPageNumber = page + 1;
+
+      this.loadProjects(nextPageNumber);
+    }
+
     render() {
-        return (
-         <div>
-             {this.state.projects.map((project) => {
-                 return <Project name={project.name} description={project.description} link={project.link} />
-             })}
-         </div>   
-        )
+      const pagination = this.state.pagination;
+
+      return (
+       <div>
+           {this.state.projects.map((project) => {
+               return <Project name={project.name} description={project.description} link={project.link} key={project.name} />
+           })}
+
+           <Pagination
+              prevPage={this.prevPage}
+              nextPage={this.nextPage}
+              pagination={this.state.pagination}
+            />
+
+       </div>
+      )
     }
 }
+
