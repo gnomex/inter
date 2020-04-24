@@ -1,16 +1,18 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
 
+import { ProjectProvider } from './components/projectContext';
 import Navbar from './components/navbar.js';
-import Projects from './components/projects.js';
+import ProjectList from './components/projectList.js';
 import Footer from './components/footer.js';
 
-function App() {
+const App = () => {
   return (
-    <div className="container">
-      <Navbar />
-      <Projects />
+    <div>
+      <ProjectProvider>
+        <Navbar />
+        <ProjectList />
+      </ProjectProvider>
       <Footer />
     </div>
   );
